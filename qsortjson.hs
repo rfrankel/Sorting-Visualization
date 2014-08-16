@@ -11,7 +11,7 @@ data History a = Branch [a] (History a) a [a] (History a)
                | Leaf [a]  deriving Show
 
 instance ToJSON a => ToJSON (History a) where
-   toJSON (Branch l1 h1 p l2 h2)  = object ["name" .= (l1 ++ [p] ++ l2), "children" .= [toJSON h1, object ["name" .= toJSON p], toJSON h2]]
+   toJSON (Branch l1 h1 p l2 h2)  = toJSON [object ["name" .=  toJSON l1, "children" .= toJSON h1], object ["name" .= toJSON p], object ["name" .=  toJSON l1, "children" .= toJSON h1]]
    toJSON (Leaf l) = object ["name" .= toJSON l]
 
 quicksort :: Ord a => [a] -> (History a)
