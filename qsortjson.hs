@@ -14,7 +14,7 @@ instance ToJSON a => ToJSON (History a) where
    toJSON (Branch l h1 p h2)  =
      object ["name" .= l
             , "children" .= [toJSON h1, object ["name" .= toJSON p], toJSON h2]]
-   toJSON (Leaf l) = object ["name" .= toJSON l]
+   toJSON (Leaf l) = object ["name" .= toJSON ("Empty"::String)]
 
 quicksort :: Ord a => [a] -> (History a)
 quicksort []           = Leaf []
