@@ -33,6 +33,12 @@ body {
   display: none;
 }
 
+.brush .extent {
+  stroke: #000;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
 </style>
 </head>
 <body>
@@ -69,7 +75,6 @@ defs.append('svg:pattern')
     .attr('width', 240)
     .attr('height', 720);
 
-
 svg.append("rect")
     .attr("class", "grid-background")
     .attr("width", width)
@@ -86,7 +91,43 @@ svg.append("g")
 
 svg.append("g")
     .attr("class", "axis")
-    .call(d3.svg.axis().scale(y).orient("left").ticks(17));
+    .call(d3.svg.axis().scale(y).orient("left").ticks(20));
+
+var brush = d3.svg.brush()
+    .y(y)
+    .extent([3, 7])
+    .on("brush", brushed);
+
+var gBrush = svg.append("g")
+    .attr("class", "brush")
+    .call(brush);
+gBrush.selectAll("rect")
+    .attr("width", width);
+
+function brushed() {
+  var extent0 = brush.extent(),
+      extent1;
+
+  // if dragging, preserve the width of the extent
+  if (d3.event.mode === "move") {
+    var d0 = d3.round(extent0[0]),
+        d1 = d3.offset(d0, Math.round((extent0[1] - extent0[0])));
+    extent1 = [d0, d1];
+  }
+
+  // otherwise, if resizing, round both dates
+  else {
+    extent1 = extent0.map(d3.round);
+
+    // if empty when rounded, use floor & ceil instead
+    if (extent1[0] >= extent1[1]) {
+      extent1[0] = d3.floor(extent0[0]);
+      extent1[1] = d3.ceil(extent0[1]);
+    }
+  }
+
+  d3.select(this).call(brush.extent(extent1));
+}
 
 </script>
 
