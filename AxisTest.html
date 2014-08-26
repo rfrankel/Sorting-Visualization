@@ -44,10 +44,10 @@ var margin = {top: 20, right: 200, bottom: 20, left: 200},
     height = 760 - margin.top - margin.bottom;
 
 var x = d3.scale.linear()
-    .domain([0, 10])
     .range([0, width]);
 
 var y = d3.scale.linear()
+    .domain([0, 16])
     .range([0, height]);
 
 var svg = d3.select("body").append("svg")
@@ -78,17 +78,15 @@ svg.append("rect")
 
 svg.append("g")
     .attr("class", "grid")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.svg.axis().scale(x).ticks(20).tickSize(-height))
+    .call(d3.svg.axis().scale(y).orient("left").ticks(32).tickSize(-width))
   .selectAll(".tick")
-    .data(x.ticks(10), function(d) { return d; })
+    .data(y.ticks(16), function(d) { return d; })
   .exit()
     .classed("minor", true);
 
 svg.append("g")
     .attr("class", "axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.svg.axis().scale(x).ticks(10));
+    .call(d3.svg.axis().scale(y).orient("left").ticks(16));
 
 
 
