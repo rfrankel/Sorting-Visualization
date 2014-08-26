@@ -1,0 +1,31 @@
+Notes about making a visualization
+
+Relevant Sortvis command line reference
+  -F READFILE_SORTHIST  Read an entire sorting history from file
+  -o OFNAME             Output file name. Only usable when a single algorithm
+                        is being drawn.
+  -v                    Be verbose.
+  --background=BACKGROUND
+                        Background colour - default ffffff.
+  --gradient-start=GRADIENT_START
+                        Gradient start colour - default ffffff.
+  --gradient-end=GRADIENT_END
+                        Gradient end colour - default 606060.
+
+ Weave:
+    Weave visualisation options.
+
+    -x WIDTH            Image width
+    -y HEIGHT           Image height
+    --line-width=LINE   Total line width
+    --border-width=BORDER
+                        Border width
+    -r                  Rotate images 90 degrees
+
+Command line currently using: 
+  ../../contrib/sortvis/sortvis weave -F svsequential.txt --line-width=10 -x 720 -y 240 -r -o svseq.png
+
+Wanting better colors, I tried:
+  ../../contrib/sortvis/sortvis weave -F svsequential.txt --line-width=10 -x 720 -y 240 --background=eeeeee --gradient-end=393b79 --gradient-start=dadaeb -r -o svseqbright.png 
+
+
