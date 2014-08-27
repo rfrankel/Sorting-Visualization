@@ -50,7 +50,7 @@ body {
 .node circle {
   fill: #fff;
   stroke: steelblue;
-  stroke-width: 1.5px;
+  stroke-width: 2px;
 }
 
 .node text {
@@ -60,7 +60,7 @@ body {
 .link {
   fill: none;
   stroke: #ccc;
-  stroke-width: 1.5px;
+  stroke-width: 2px;
 }
 
 </style>
@@ -82,6 +82,9 @@ var x = d3.scale.linear()
 
 // Sortvis makes weave ends that are 2% of the total
 var weavend = wheight*.02;
+// Number of levels in this tree, and pixels per level
+var numLevels = 20;
+var levelPix = (wheight-2*weavend)/numLevels;
 
 var y = d3.scale.linear()
     .domain([0, 20])
@@ -164,14 +167,21 @@ function brushed() {
 
   d3.select(this).call(brush.extent(extent1));
   
-  root.children.forEach(selectiveexpand);
+  root.children.forEach(function(d) {redrawOnTick(extent1[1],d);});
   update(root);
 }
 
-function selectiveexpand(tck,d) {
-    if (d.tick < tck ) {
-      d.children = d._children;
-      d.parent.forEach(selectiveexpand);
+function redrawOnTick(tck,d) {
+    console.log("For node %O, Pivot_p is %s", d, d.Pp);
+    if (d.Pp)  
+      console.log("Pp tested as true");
+      d.y = tck * levelPix;
+    if (!d.Pp && (d.parent.tick < tck))
+      d.y = (d.parent.tick + 1) * levelPix;
+    if (d.children && d.tick >= tck) {
+      d._children = d.children;
+      d._children.forEach(function(d) {redrawOnTick(tck,d);});
+      d.children = null;
     }
   }
 
@@ -206,20 +216,21 @@ var diagonal = d3.svg.diagonal()
 var treegr = svg.append("g")
     .attr("transform", "translate(" + -1*(tmargin.right + wwidth + wmargin.right + wmargin.left) + "," + weavend + ")");
 
-d3.json("./qsortSequential.json", function(error, flare) {
+d3.json("./qsortTrackPivot.json", function(error, flare) {
   root = flare;
   root.x0 = theight / 2;
   root.y0 = 0;
 
-  function collapse(d) {
+  function collapseAndSetY(d) {
+    d.y = d.tick * levelPix; 
     if (d.children) {
       d._children = d.children;
-      d._children.forEach(collapse);
+      d._children.forEach(collapseAndSetY);
       d.children = null;
     }
   }
 
-  root.children.forEach(collapse);
+  root.children.forEach(collapseAndSetY);
   update(root);
 });
 
@@ -232,7 +243,6 @@ function update(source) {
       links = tree.links(nodes);
 
   // Normalize for fixed-depth.
-  var levelPix = (wheight-2*weavend)/20;
   nodes.forEach(function(d) { d.y = d.tick * levelPix; });
 
   // Update the nodes…
