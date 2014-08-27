@@ -69,7 +69,7 @@ body {
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
-var tmargin = {top: 20, right: 120, bottom: 20, left: 20},
+var tmargin = {top: 20, right: 200, bottom: 20, left: 20},
     twidth = 800 - tmargin.right - tmargin.left,
     theight = 800 - tmargin.top - tmargin.bottom;
 
@@ -187,9 +187,9 @@ var tree = d3.layout.tree()
     .separation(function separation(a, b) {
     if (a.parent == b.parent) 
      if ((a.tick - a.depth) > 1) 
-      return (a.tick - a.parent.tick - 1)
+      return (a.tick - a.parent.tick/2)
      else if ((b.tick - b.depth) > 1)
-      return (b.tick - b.parent.tick - 1 ) 
+      return (b.tick - b.parent.tick/2) 
      else 
       return 1
     else 
@@ -204,7 +204,7 @@ var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.x, d.y]; });
 
 var treegr = svg.append("g")
-    .attr("transform", "translate(" + -1*(tmargin.right + wwidth + wmargin.right + wmargin.left) + "," + 0 + ")");
+    .attr("transform", "translate(" + -1*(tmargin.right + wwidth + wmargin.right + wmargin.left) + "," + weavend + ")");
 
 d3.json("./qsortSequential.json", function(error, flare) {
   root = flare;
