@@ -80,9 +80,12 @@ var wmargin = {top: 20, right: 200, bottom: 20, left: 200},
 var x = d3.scale.linear()
     .range([0, wwidth]);
 
+// Sortvis makes weave ends that are 2% of the total
+var weavend = wheight*.02;
+
 var y = d3.scale.linear()
-    .domain([-.5, 22])
-    .range([0, wheight]);
+    .domain([0, 20])
+    .range([weavend, wheight-weavend]);
 
 var svg = d3.select("body").append("svg")
     .attr("width", twidth + tmargin.right + tmargin.left + wwidth + wmargin.right + wmargin.left)
@@ -113,15 +116,15 @@ svg.append("rect")
 
 svg.append("g")
     .attr("class", "grid")
-    .call(d3.svg.axis().scale(y).orient("left").ticks(44).tickSize(-wwidth))
+    .call(d3.svg.axis().scale(y).orient("left").ticks(40).tickSize(-wwidth))
   .selectAll(".tick")
-    .data(y.ticks(22), function(d) { return d; })
+    .data(y.ticks(20), function(d) { return d; })
   .exit()
     .classed("minor", true);
 
 svg.append("g")
     .attr("class", "axis")
-    .call(d3.svg.axis().scale(y).orient("left").ticks(22));
+    .call(d3.svg.axis().scale(y).orient("left").ticks(20));
 
 var brush = d3.svg.brush()
     .y(y)
