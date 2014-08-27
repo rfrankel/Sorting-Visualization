@@ -187,9 +187,9 @@ var tree = d3.layout.tree()
     .separation(function separation(a, b) {
     if (a.parent == b.parent) 
      if ((a.tick - a.depth) > 1) 
-      return (a.tick - a.parent.tick/2)
+      return ((a.tick - a.parent.tick)/2)
      else if ((b.tick - b.depth) > 1)
-      return (b.tick - b.parent.tick/2) 
+      return ((b.tick - b.parent.tick)/2) 
      else 
       return 1
     else 
