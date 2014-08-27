@@ -3,6 +3,8 @@
 <head>
 <style>
 
+/* Weave Brush styles */
+
 body {
   font: 10px sans-serif;
   shape-rendering: crispEdges;
@@ -39,6 +41,28 @@ body {
   shape-rendering: crispEdges;
 }
 
+/* Tree styles */
+
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
 </style>
 </head>
 <body>
@@ -57,7 +81,7 @@ var x = d3.scale.linear()
     .range([0, wwidth]);
 
 var y = d3.scale.linear()
-    .domain([0, 22])
+    .domain([-.5, 22])
     .range([0, wheight]);
 
 var svg = d3.select("body").append("svg")
@@ -75,7 +99,7 @@ defs.append('svg:pattern')
     .attr('width', '240')
     .attr('height', '720')
     .append('svg:image')
-    .attr('xlink:href', 'svparbright.png')
+    .attr('xlink:href', 'svseqbright.png')
     .attr('x', 0)
     .attr('y', 0)
     .attr('width', 240)
@@ -133,10 +157,167 @@ function brushed() {
   }
 
   d3.select(this).call(brush.extent(extent1));
+  
+  root.children.forEach(selectiveexpand);
+  update(root);
 }
+
+function selectiveexpand(tck,d) {
+    if (d.tick < tck ) {
+      d.children = d._children;
+      d.parent.forEach(selectiveexpand);
+    }
+  }
 
 
 // ----------- Tree -------------------
+
+var i = 0,
+    duration = 750,
+    root;
+
+var tree = d3.layout.tree()
+    .size([theight, twidth])
+    .separation(function separation(a, b) {
+    if (a.parent == b.parent) 
+     if ((a.tick - a.depth) > 1) 
+      return (a.tick - a.depth - 1)
+     else if ((b.tick - b.depth) > 1)
+      return (b.tick - b.depth - 1) 
+     else 
+      return 1
+    else 
+     return 2
+    }
+);
+
+// Old separation function
+//    if ((a.parent == b.parent) && (((a.tick - a.depth) > 0) || ((b.tick - b.depth) > 0)))
+
+var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.x, d.y]; });
+
+var treegr = svg.append("g")
+    .attr("transform", "translate(" + -1*(tmargin.right + wwidth + wmargin.right + wmargin.left) + "," + 0 + ")");
+
+d3.json("./qsortSequential.json", function(error, flare) {
+  root = flare;
+  root.x0 = theight / 2;
+  root.y0 = 0;
+
+  function collapse(d) {
+    if (d.children) {
+      d._children = d.children;
+      d._children.forEach(collapse);
+      d.children = null;
+    }
+  }
+
+  root.children.forEach(collapse);
+  update(root);
+});
+
+d3.select(self.frameElement).style("height", "800px");
+
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+      links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.tick * 33; });
+
+  // Update the nodes…
+  var node = treegr.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
+      .on("click", click);
+
+  nodeEnter.append("circle")
+      .attr("r", 1e-6)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeEnter.append("text")
+      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+      .text(function(d) { return d.name; })
+      .style("fill-opacity", 1e-6);
+
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  nodeUpdate.select("circle")
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeUpdate.select("text")
+      .style("fill-opacity", 1);
+
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
+      .remove();
+
+  nodeExit.select("circle")
+      .attr("r", 1e-6);
+
+  nodeExit.select("text")
+      .style("fill-opacity", 1e-6);
+
+  // Update the links…
+  var link = treegr.selectAll("path.link")
+      .data(links, function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("path", "g")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var o = {x: source.x0, y: source.y0};
+        return diagonal({source: o, target: o});
+      });
+
+  // Transition links to their new position.
+  link.transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+      .duration(duration)
+      .attr("d", function(d) {
+        var o = {x: source.x, y: source.y};
+        return diagonal({source: o, target: o});
+      })
+      .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+}
+
+// Toggle children on click.
+function click(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update(d);
+}
+
 
 </script>
 
