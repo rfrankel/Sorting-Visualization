@@ -17,8 +17,9 @@ instance ToJSON a => ToJSON (History a) where
    toJSON (Branch l h1 p h2 t)  =
      object ["name" .= l,
              "tick" .= toJSON t,
-             "children" .= [toJSON h1, object ["name" .= toJSON p, "tick" .= toJSON (t+1)], toJSON h2]]
-   toJSON (Leaf l t) = object ["name" .= toJSON ("Empty"::String), "tick" .= toJSON t]
+             "children" .= [toJSON h1, object ["name" .= toJSON p, "tick" .= toJSON (t+1), "Pp" .= toJSON (True::Bool)], toJSON h2],
+	     "Pp" .= toJSON (False::Bool)]
+   toJSON (Leaf l t) = object ["name" .= toJSON ("Empty"::String), "tick" .= toJSON t, "Pp" .= toJSON (True::Bool)]
 
 --- instance ToJSON ClockTick where
 ---     toJSON t = object t
