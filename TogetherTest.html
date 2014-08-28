@@ -171,7 +171,7 @@ function brushed() {
   d3.select(this).call(brush.extent(extent1));
   
   root.children.forEach(function(d) {redrawOnTick(extent1[1],d);});
-  update(root,extent1[1]);
+  update(root);
 }
 
   // function for finding nodes that make up lists at a given tick level
@@ -246,17 +246,12 @@ d3.json("./qsortTrackPivot.json", function(error, flare) {
   }
 
   //root.children.forEach(collapse);
-  update(root,0);
+  update(root);
 });
 
 d3.select(self.frameElement).style("height", "800px");
 
-// Updates all the nodes below the given source on tick tck
-// If tck == 0 then draw the tree uninfluenced by the tick
-function update(source,tck) {
-  console.log("Calling Update with tick %d", tck);
-  // let tck default to 0
-  tck = typeof tck !== 'undefined' ? tck : 0;
+function update(source) {
 
   // Compute the new tree layout.
   var nodes = tree.nodes(root).reverse(),
