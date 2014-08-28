@@ -155,12 +155,12 @@ var gBrush = svg.append("g")
 gBrush.selectAll("rect")
     .attr("width", wwidth);
 
-var handle = gBrush.append("circle")
+var handle = gBrush.selectAll(".resize")
+    .append("circle")
     .attr("class", "handle")
     .attr("r", lgCircSize)
     .attr("fill", lgCircFill)
-    .attr("stroke", lgCircStroke)
-    .attr("transform", "translate(0," + weavend + ")");
+    .attr("stroke", lgCircStroke);
 
 function brushed() {
   var extent0 = brush.extent(),
