@@ -255,15 +255,15 @@ d3.json("./qsortTrackPivot.json", function(error, flare) {
   root.x0 = theight / 2;
   root.y0 = 0;
 
-  function collapse(d) {
+  function setInitialState(d) {
+    d.radius = 3.5;
     if (d.children) {
-      d._children = d.children;
-      d._children.forEach(collapse);
-      d.children = null;
+      d.children.forEach(setInitialState);
     }
   }
 
-  //root.children.forEach(collapse);
+  setInitialState(root);
+  //root.children.forEach(setInitialState);
   update(root);
 });
 
@@ -360,18 +360,25 @@ function update(source) {
 }
 
 // Toggle children on click.
-function click(d) {
-  if (d.children) {
-    d._children = d.children;
-    d.children = null;
-  } else {
-    d.children = d._children;
-    d._children = null;
-  }
-  update(d,0);
-}
+//function click(d) {
+//  if (d.children) {
+//    d._children = d.children;
+//    d.children = null;
+//  } else {
+//    d.children = d._children;
+//    d._children = null;
+//  }
+//  update(d,0);
+//}
 
-
+// Determine the extent of ticks represented in this subtree
+//function determineTickExtent(d) {
+//  var lowTick = d.click;
+//  var highTick = d.click;
+//  if (d.children) {
+//    return d.children.forEach(function(d) { });
+//  }
+//}
 </script>
 
 </body>
