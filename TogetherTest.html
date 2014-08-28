@@ -248,11 +248,11 @@ function update(source,tck) {
   else 
     nodes.forEach(function(d) {
       console.log("Considering node %O", d);
-      if (!(d.name instanceof Array) && d.name != "Empty")  {
+      if (d.Pp)  {
         console.log("Pivot -- Proposed y was tick level %d", tck);
         d.y = tck * levelPix;
       } else
-        if (d.tick > 1 && d.parent.tick < tck && d.name instanceof Array) {
+        if (d.tick >= tck && d.parent.tick < tck && d.name != "Empty") {
         console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
         console.log("NonPivot: Proposed y was tick level %d", (d.parent.tick + 1));
         d.y = tck * levelPix;
