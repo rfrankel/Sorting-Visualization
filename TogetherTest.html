@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
+<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
 <style>
 
 /* Weave Brush styles */
@@ -50,11 +51,11 @@ body {
 .node circle {
   fill: #fff;
   stroke: steelblue;
-  stroke-width: 2px;
+  stroke-width: 3px;
 }
 
 .node text {
-  font: 10px sans-serif;
+  font: 12px Inconsolata;sans-serif;
 }
 
 .link {
@@ -252,7 +253,7 @@ function update(source,tck) {
         console.log("Pivot -- Proposed y was tick level %d", tck);
         d.y = tck * levelPix;
       } else
-        if (d.tick >= tck && d.parent.tick < tck && d.name != "Empty") {
+        if (d.tick >= tck && d.parent.tick < tck && d.name != "{}") {
         console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
         console.log("NonPivot: Proposed y was tick level %d", (d.parent.tick + 1));
         d.y = tck * levelPix;
@@ -278,9 +279,9 @@ function update(source,tck) {
       .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
   nodeEnter.append("text")
-      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("x", function(d) { return d.children || d._children || (d.name == "{}") ? -10 : 10; })
       .attr("dy", ".35em")
-      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+      .attr("text-anchor", function(d) { return d.children || d._children || (d.name == "{}") ? "end" : "start"; })
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6);
 
