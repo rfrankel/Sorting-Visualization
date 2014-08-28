@@ -42,7 +42,7 @@ body {
   shape-rendering: crispEdges;
 }
 
-.brush .handle {
+.handle {
  stroke-width: 2.75px;
 }
 
@@ -146,7 +146,7 @@ svg.append("g")
 
 var brush = d3.svg.brush()
     .y(y)
-    .extent([3, 7])
+    .extent([-.5, 0])
     .on("brush", brushed);
 
 var gBrush = svg.append("g")
@@ -155,12 +155,19 @@ var gBrush = svg.append("g")
 gBrush.selectAll("rect")
     .attr("width", wwidth);
 
-var handle = gBrush.selectAll(".resize")
-    .append("circle")
+var handle1 = gBrush.append("circle")
     .attr("class", "handle")
     .attr("r", lgCircSize)
     .attr("fill", lgCircFill)
-    .attr("stroke", lgCircStroke);
+    .attr("stroke", lgCircStroke)
+    .attr("transform", "translate(0," + weavend + ")");
+
+var handle2 = gBrush.append("circle")
+    .attr("class", "handle")
+    .attr("r", lgCircSize)
+    .attr("fill", lgCircFill)
+    .attr("stroke", lgCircStroke)
+    .attr("transform", "translate(" + wwidth + "," + weavend + ")");
 
 function brushed() {
   var extent0 = brush.extent(),
@@ -189,6 +196,8 @@ function brushed() {
     }
   }
 
+  handle1.attr("cy", y(extent1[1]));
+  handle2.attr("cy", y(extent1[1]));
   d3.select(this).call(brush.extent(extent1));
   
   root.children.forEach(function(d) {colorOnTick(extent1[1],d);});
