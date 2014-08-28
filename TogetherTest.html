@@ -205,6 +205,8 @@ function brushed() {
         d0 = d3.round(extent0[0],0);
     if (d0 >= d1) 
        d0 = d1 - 1;
+    if (d0 < d1 && (d1-d0) > 1)
+       d1 = d0 + 1
     extent1 = [d0, d1];
   }
 
