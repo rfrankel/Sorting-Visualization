@@ -51,7 +51,7 @@ body {
 .node circle {
   fill: #fff;
   stroke: steelblue;
-  stroke-width: 3px;
+  stroke-width: 2.75px;
 }
 
 .node text {
@@ -170,7 +170,7 @@ function brushed() {
 
   d3.select(this).call(brush.extent(extent1));
   
-  root.children.forEach(function(d) {redrawOnTick(extent1[1],d);});
+  root.children.forEach(function(d) {colorOnTick(extent1[1],d);});
   update(root);
 }
 
@@ -193,11 +193,29 @@ function brushed() {
 
 
 
-function redrawOnTick(tck,d) {
-    if (d.children && d.tick >= tck) {
-      d._children = d.children;
-      d._children.forEach(function(d) {redrawOnTick(tck,d);});
-      d.children = null;
+function colorOnTick(tck,d) {
+      console.log("Considering node %O", d);
+      if (d.Pp && d.tick <= tck)  {
+        console.log("Pivot -- at tick level %d", tck);
+        d.radius = 7
+        d.fillstyle = "#d39ed6";
+        d.strokestyle = "#7b4173";
+       } else
+         if (d.tick >= tck && d.parent.tick < tck && d.name != "{}") {
+         console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
+         console.log("NonPivot: at tick level %d", (d.parent.tick + 1));
+         d.radius = 7
+         d.fillstyle = "#d39ed6"
+         d.strokestyle = "#7b4173"
+      } else {
+        console.log("Normal node: at tick level %d", d.tick);
+         d.radius = 4.5
+         d.fillstyle = "#fff";
+         d.strokestyle = "steelblue";
+      }
+
+    if (d.children) {
+      d.children.forEach(function(d) {colorOnTick(tck,d);});
     }
   }
 
@@ -276,7 +294,7 @@ function update(source) {
       .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
   nodeEnter.append("text")
-      .attr("x", function(d) { return d.children || d._children || (d.name == "{}") ? -10 : 10; })
+      .attr("x", function(d) { return d.children || d._children || (d.name == "{}") ? (d.radius + 5.5) * -1 : d.radius + 5.5; })
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children || (d.name == "{}") ? "end" : "start"; })
       .text(function(d) { return d.name; })
@@ -288,10 +306,12 @@ function update(source) {
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   nodeUpdate.select("circle")
-      .attr("r", 4.5)
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+      .attr("r", function(d) { return d.radius; })
+      .style("stroke", function(d) { return d.strokestyle; })
+      .style("fill", function(d) { return d.fillstyle; });
 
   nodeUpdate.select("text")
+      .attr("x", function(d) { return d.children || d._children || (d.name == "{}") ? (d.radius + 5.5) * -1 : d.radius + 5.5; })
       .style("fill-opacity", 1);
 
   // Transition exiting nodes to the parent's new position.
