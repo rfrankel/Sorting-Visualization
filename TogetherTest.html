@@ -42,6 +42,10 @@ body {
   shape-rendering: crispEdges;
 }
 
+.brush .handle {
+ stroke-width: 2.75px;
+}
+
 /* Tree styles */
 
 .node {
@@ -87,6 +91,16 @@ var weavend = wheight*.02;
 var numLevels = 20;
 var levelPix = (wheight-2*weavend)/numLevels;
 
+// --- Appearance Settings ----
+
+var lgCircSize = 7,
+    smCircSize = 3.5,
+    smCircStroke = "steelblue",
+    smCircFill = "#fff",
+    lgCircStroke = "#7b4173",
+    lgCircFill = "#d39ed6", 
+    treeSqueezeFactor = 2;
+
 var y = d3.scale.linear()
     .domain([0, 20])
     .range([weavend, wheight-weavend]);
@@ -128,7 +142,7 @@ svg.append("g")
 
 svg.append("g")
     .attr("class", "axis")
-    .call(d3.svg.axis().scale(y).orient("left").ticks(20).tickSize(10));
+    .call(d3.svg.axis().scale(y).orient("left").ticks(20).tickSize(lgCircSize*2));
 
 var brush = d3.svg.brush()
     .y(y)
@@ -140,6 +154,13 @@ var gBrush = svg.append("g")
     .call(brush);
 gBrush.selectAll("rect")
     .attr("width", wwidth);
+
+var handle = gBrush.append("circle")
+    .attr("class", "handle")
+    .attr("r", lgCircSize)
+    .attr("fill", lgCircFill)
+    .attr("stroke", lgCircStroke)
+    .attr("transform", "translate(0," + weavend + ")");
 
 function brushed() {
   var extent0 = brush.extent(),
@@ -222,15 +243,6 @@ function colorOnTick(tck,d) {
 
 // ----------- Tree -------------------
 
-// ---- Tree Appearance Settings ----
-
-var lgCircSize = 7,
-    smCircSize = 3.5,
-    smCircStroke = "steelblue",
-    smCircFill = "#fff",
-    lgCircStroke = "#7b4173",
-    lgCircFill = "#d39ed6";;
-
 var i = 0,
     duration = 750,
     root;
@@ -240,9 +252,9 @@ var tree = d3.layout.tree()
     .separation(function separation(a, b) {
     if (a.parent == b.parent) 
      if ((a.tick - a.depth) > 1) 
-      return ((a.tick - a.parent.tick)/2)
+      return ((a.tick - a.parent.tick)/treeSqueezeFactor)
      else if ((b.tick - b.depth) > 1)
-      return ((b.tick - b.parent.tick)/2) 
+      return ((b.tick - b.parent.tick)/treeSqueezeFactor) 
      else 
       return 1
     else 
