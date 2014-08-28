@@ -162,6 +162,7 @@ var handle1 = gBrush.append("circle")
     .attr("r", lgCircSize)
     .attr("fill", lgCircFill)
     .attr("stroke", lgCircStroke)
+    .attr("cy", y(0))
     .attr("transform", "translate( " + -1*lgCircSize/2 + " ,0 )");
 
 var handle2 = gBrush.append("circle")
@@ -169,11 +170,10 @@ var handle2 = gBrush.append("circle")
     .attr("r", lgCircSize)
     .attr("fill", lgCircFill)
     .attr("stroke", lgCircStroke)
+    .attr("cy", y(0))
     .attr("transform", "translate(" + wwidth + ", 0 )");
 
 // setting the initial handle position
-handle1.attr("cy", y(brush.extent[1]));
-handle2.attr("cy", y(brush.extent[1]));
 
 function brushed() {
   var extent0 = brush.extent(),
