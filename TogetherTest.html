@@ -159,25 +159,21 @@ function brushed() {
     console.log("Extent: %o",extent1);
 
     // if empty when rounded, use floor & ceil instead
+    // this doesn't work for things other than dates
+    // need something else (TODO!)
     if (extent1[0] >= extent1[1]) {
-      extent1[0] = d3.floor(extent0[0]);
-      extent1[1] = d3.ceil(extent0[1]);
+      extent1[1] = d3.round(extent0[1]);
+      extent1[0] = extent1[1] - 1;
     }
   }
 
   d3.select(this).call(brush.extent(extent1));
   
   root.children.forEach(function(d) {redrawOnTick(extent1[1],d);});
-  update(root);
+  update(root,extent1[1]);
 }
 
 function redrawOnTick(tck,d) {
-    console.log("For node %O, Pivot_p is %s", d, d.Pp);
-    if (d.Pp)  
-      console.log("Pp tested as true");
-      d.y = tck * levelPix;
-    if (!d.Pp && (d.parent.tick < tck))
-      d.y = (d.parent.tick + 1) * levelPix;
     if (d.children && d.tick >= tck) {
       d._children = d.children;
       d._children.forEach(function(d) {redrawOnTick(tck,d);});
@@ -221,29 +217,51 @@ d3.json("./qsortTrackPivot.json", function(error, flare) {
   root.x0 = theight / 2;
   root.y0 = 0;
 
-  function collapseAndSetY(d) {
-    d.y = d.tick * levelPix; 
+  function collapse(d) {
     if (d.children) {
       d._children = d.children;
-      d._children.forEach(collapseAndSetY);
+      d._children.forEach(collapse);
       d.children = null;
     }
   }
 
-  root.children.forEach(collapseAndSetY);
-  update(root);
+  root.children.forEach(collapse);
+  update(root,0);
 });
 
 d3.select(self.frameElement).style("height", "800px");
 
-function update(source) {
+// Updates all the nodes below the given source on tick tck
+// If tck == 0 then draw the tree uninfluenced by the tick
+function update(source,tck) {
+  console.log("Calling Update with tick %d", tck);
+  // let tck default to 0
+  tck = typeof tck !== 'undefined' ? tck : 0;
 
   // Compute the new tree layout.
   var nodes = tree.nodes(root).reverse(),
       links = tree.links(nodes);
 
-  // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.tick * levelPix; });
+  // Normalize for fixed-depth or show influence of tick
+  if (tck == 0)
+    nodes.forEach(function(d) { d.y = d.tick * levelPix; });
+  else 
+    nodes.forEach(function(d) {
+      console.log("Considering node %O", d);
+      if (!(d.name instanceof Array) && d.name != "Empty")  {
+        console.log("Pivot -- Proposed y was tick level %d", tck);
+        d.y = tck * levelPix;
+      } else
+        if (d.tick > 1 && d.parent.tick < tck && d.name instanceof Array) {
+        console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
+        console.log("NonPivot: Proposed y was tick level %d", (d.parent.tick + 1));
+        d.y = tck * levelPix;
+      } else {
+        console.log("Normal node: Proposed y was tick level %d", d.tick);
+        d.y = d.tick * levelPix;
+      }
+   });
+    
 
   // Update the nodes…
   var node = treegr.selectAll("g.node")
@@ -332,7 +350,7 @@ function click(d) {
     d.children = d._children;
     d._children = null;
   }
-  update(d);
+  update(d,0);
 }
 
 
