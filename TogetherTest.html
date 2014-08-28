@@ -157,6 +157,14 @@ var gBrush = svg.append("g")
 gBrush.selectAll("rect")
     .attr("width", wwidth);
 
+var handle3 = gBrush.append("rect")
+    .attr("class", "handle")
+    .attr("width", wwidth)
+    .attr("fill", lgCircFill)
+    .attr("stroke", lgCircStroke)
+    .attr("y", y(0))
+    .attr("height", lgCircSize/3);
+
 var handle1 = gBrush.append("circle")
     .attr("class", "handle")
     .attr("r", lgCircSize)
@@ -173,7 +181,6 @@ var handle2 = gBrush.append("circle")
     .attr("cy", y(0))
     .attr("transform", "translate(" + wwidth + ", 0 )");
 
-// setting the initial handle position
 
 function brushed() {
   var extent0 = brush.extent(),
@@ -203,6 +210,7 @@ function brushed() {
 
   handle1.attr("cy", y(extent1[1]));
   handle2.attr("cy", y(extent1[1]));
+  handle3.attr("y", y(extent1[1]));
   d3.select(this).call(brush.extent(extent1));
   
   root.children.forEach(function(d) {colorOnTick(extent1[1],d);});
