@@ -159,15 +159,18 @@ var handle1 = gBrush.append("circle")
     .attr("class", "handle")
     .attr("r", lgCircSize)
     .attr("fill", lgCircFill)
-    .attr("stroke", lgCircStroke)
-    .attr("transform", "translate(0," + weavend + ")");
+    .attr("stroke", lgCircStroke);
 
 var handle2 = gBrush.append("circle")
     .attr("class", "handle")
     .attr("r", lgCircSize)
     .attr("fill", lgCircFill)
     .attr("stroke", lgCircStroke)
-    .attr("transform", "translate(" + wwidth + "," + weavend + ")");
+    .attr("transform", "translate(" + wwidth + ", 0 )");
+
+// setting the initial handle position
+handle1.attr("cy", y(brush.extent[1]));
+handle2.attr("cy", y(brush.extent[1]));
 
 function brushed() {
   var extent0 = brush.extent(),
@@ -204,41 +207,22 @@ function brushed() {
   update(root);
 }
 
-  // function for finding nodes that make up lists at a given tick level
-  //  nodes.forEach(function(d) {
-  //    console.log("Considering node %O", d);
-  //    if (d.Pp)  {
-  //      console.log("Pivot -- Proposed y was tick level %d", tck);
-  //      d.y = tck * levelPix;
-  //     } else
-  //       if (d.tick >= tck && d.parent.tick < tck && d.name != "{}") {
-  //       console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
-  //       console.log("NonPivot: Proposed y was tick level %d", (d.parent.tick + 1));
-  //       d.y = tck * levelPix;
-  //    } else {
-  //      console.log("Normal node: Proposed y was tick level %d", d.tick);
-  //      d.y = d.tick * levelPix;
-  //    }
-  // });
-
-
-
 function colorOnTick(tck,d) {
-      console.log("Considering node %O", d);
+      //console.log("Considering node %O", d);
       if (d.Pp && d.tick <= tck)  {
-        console.log("Pivot -- at tick level %d", tck);
+        //console.log("Pivot -- at tick level %d", tck);
         d.radius = lgCircSize;
         d.fillstyle = lgCircFill;
         d.strokestyle = lgCircStroke;
        } else
          if (d.tick >= tck && d.parent.tick < tck && d.name != "{}") {
-         console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
-         console.log("NonPivot: at tick level %d", (d.parent.tick + 1));
+         //console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
+         //console.log("NonPivot: at tick level %d", (d.parent.tick + 1));
          d.radius = lgCircSize;
          d.fillstyle = lgCircFill;
          d.strokestyle = lgCircStroke;
       } else {
-        console.log("Normal node: at tick level %d", d.tick);
+        //console.log("Normal node: at tick level %d", d.tick);
          d.radius = smCircSize;
          d.fillstyle = smCircFill;
          d.strokestyle = smCircStroke;
