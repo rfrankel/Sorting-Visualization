@@ -93,12 +93,14 @@ var levelPix = (wheight-2*weavend)/numLevels;
 
 // --- Appearance Settings ----
 
-var lgCircSize = 7,
+var lgCircSize = 10,
     smCircSize = 3.5,
     smCircStroke = "steelblue",
     smCircFill = "#fff",
-    lgCircStroke = "#7b4173",
-    lgCircFill = "#d39ed6", 
+    //lgCircStroke = "#7b4173",
+    //lgCircFill = "#d39ed6", 
+    lgCircStroke = "#17becf",
+    lgCircFill = "#9edae5", 
     treeSqueezeFactor = 2;
 
 var y = d3.scale.linear()
@@ -159,7 +161,8 @@ var handle1 = gBrush.append("circle")
     .attr("class", "handle")
     .attr("r", lgCircSize)
     .attr("fill", lgCircFill)
-    .attr("stroke", lgCircStroke);
+    .attr("stroke", lgCircStroke)
+    .attr("transform", "translate( " + -1*lgCircSize/2 + " ,0 )");
 
 var handle2 = gBrush.append("circle")
     .attr("class", "handle")
