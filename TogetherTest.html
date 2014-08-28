@@ -128,7 +128,7 @@ svg.append("g")
 
 svg.append("g")
     .attr("class", "axis")
-    .call(d3.svg.axis().scale(y).orient("left").ticks(20));
+    .call(d3.svg.axis().scale(y).orient("left").ticks(20).tickSize(10));
 
 var brush = d3.svg.brush()
     .y(y)
@@ -197,21 +197,21 @@ function colorOnTick(tck,d) {
       console.log("Considering node %O", d);
       if (d.Pp && d.tick <= tck)  {
         console.log("Pivot -- at tick level %d", tck);
-        d.radius = 7
-        d.fillstyle = "#d39ed6";
-        d.strokestyle = "#7b4173";
+        d.radius = lgCircSize;
+        d.fillstyle = lgCircFill;
+        d.strokestyle = lgCircStroke;
        } else
          if (d.tick >= tck && d.parent.tick < tck && d.name != "{}") {
          console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
          console.log("NonPivot: at tick level %d", (d.parent.tick + 1));
-         d.radius = 7
-         d.fillstyle = "#d39ed6"
-         d.strokestyle = "#7b4173"
+         d.radius = lgCircSize;
+         d.fillstyle = lgCircFill;
+         d.strokestyle = lgCircStroke;
       } else {
         console.log("Normal node: at tick level %d", d.tick);
-         d.radius = 3.5
-         d.fillstyle = "#fff";
-         d.strokestyle = "steelblue";
+         d.radius = smCircSize;
+         d.fillstyle = smCircFill;
+         d.strokestyle = smCircStroke;
       }
 
     if (d.children) {
@@ -221,6 +221,15 @@ function colorOnTick(tck,d) {
 
 
 // ----------- Tree -------------------
+
+// ---- Tree Appearance Settings ----
+
+var lgCircSize = 7,
+    smCircSize = 3.5,
+    smCircStroke = "steelblue",
+    smCircFill = "#fff",
+    lgCircStroke = "#7b4173",
+    lgCircFill = "#d39ed6";;
 
 var i = 0,
     duration = 750,
@@ -256,7 +265,7 @@ d3.json("./qsortTrackPivot.json", function(error, flare) {
   root.y0 = 0;
 
   function setInitialState(d) {
-    d.radius = 3.5;
+    d.radius = smCircSize;
     if (d.children) {
       d.children.forEach(setInitialState);
     }
@@ -360,7 +369,7 @@ function update(source) {
 }
 
 // Toggle children on click.
-//function click(d) {
+function click(d) {
 //  if (d.children) {
 //    d._children = d.children;
 //    d.children = null;
@@ -369,7 +378,7 @@ function update(source) {
 //    d._children = null;
 //  }
 //  update(d,0);
-//}
+}
 
 // Determine the extent of ticks represented in this subtree
 //function determineTickExtent(d) {
