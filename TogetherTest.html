@@ -387,24 +387,36 @@ function update(source) {
 
 // Toggle children on click.
 function click(d) {
-//  if (d.children) {
-//    d._children = d.children;
-//    d.children = null;
-//  } else {
-//    d.children = d._children;
-//    d._children = null;
-//  }
-//  update(d,0);
+    tickExtent = getTickExtent(d);
+    //console.log("Tick extent of node is %O", tickExtent(d));
+    if (tickExtent[0] != tickExtent[1]) 
+        gBrush.call(brush.extent(tickExtent));
+    else 
+        gBrush.call(brush.extent([tickExtent[1]-1,tickExtent[1]]));  
 }
 
 // Determine the extent of ticks represented in this subtree
-//function determineTickExtent(d) {
-//  var lowTick = d.click;
-//  var highTick = d.click;
-//  if (d.children) {
-//    return d.children.forEach(function(d) { });
-//  }
-//}
+function getTickExtent(d) {
+
+    function getHighestTick(d) {
+        if (d.children) {
+           //console.log("Child ticks are %O", d.children.map(function(child) {return getHighestTick(child)}));
+           return maxInArray(d.children.map(function(child) {return getHighestTick(child)}));
+        } else {
+           //console.log("Click value of node is %d", d.tick);
+           return d.tick
+        }
+    } 
+
+  return [d.tick, getHighestTick(d)];    
+}
+
+// As discussed http://stackoverflow.com/questions/1379553/how-might-i-find-the-largest-number-contained-in-a-javascript-array
+
+function maxInArray( array ){
+    return Math.max.apply( Math, array );
+};
+
 </script>
 
 </body>
