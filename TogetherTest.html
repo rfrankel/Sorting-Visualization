@@ -149,7 +149,8 @@ svg.append("g")
 var brush = d3.svg.brush()
     .y(y)
     .extent([-.5, 0])
-    .on("brush", brushed);
+    .on("brush", brushed)
+    .on("brushend", brushended);
 
 var gBrush = svg.append("g")
     .attr("class", "brush")
@@ -193,7 +194,7 @@ var handle2 = gBrush.append("circle")
 var curveFunction = d3.svg.line()
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; })
-    .interpolate("cardinal");
+    .interpolate("cardinal-open");
 
 function brushed() {
   var extent0 = brush.extent(),
@@ -226,14 +227,25 @@ function brushed() {
   handle1.attr("cy", y(extent1[1]));
   handle2.attr("cy", y(extent1[1]));
   handle3.attr("y", y(extent1[1]));
-  d3.select(this).call(brush.extent(extent1));
-  
+  d3.select(this).call(brush.extent(extent1)); 
+}
+
+function brushended() {
+  var extent = brush.extent(),
+
   coloredNodes = new Array();
-  root.children.forEach(function(d) {colorOnTick(extent1[1],d,coloredNodes);});
+  root.children.forEach(function(d) {colorOnTick(extent[1],d,coloredNodes);});
   //console.log("coloredNodes is %O",coloredNodes);
+ update(root);
 
     var curvedata = coloredNodes.map(function(d) { return { "x": d.x, "y": d.y}});
-    //console.log("curvedata is %O",curvedata);
+    // repeating first & last point because cardinal-open seems to need it.
+    // (last not repeated exactly to make a smoother glide in)
+    curvedata.unshift({"x":coloredNodes[0].x,"y":coloredNodes[0].y});
+    curvedata.push({"x":twidth + wmargin.left + lgCircSize*3,"y":y(extent[1])-tmargin.top});
+    curvedata.push({"x":twidth + wmargin.left + wwidth,"y":y(extent[1])-tmargin.top});
+
+    console.log("curvedata is %O",curvedata);
     //console.log("Curve is %s",curveFunction(curvedata));
 
     ansPath = treegr.append("path")
@@ -242,7 +254,7 @@ function brushed() {
             .attr("stroke",lgCircStroke)
             .attr("fill","none")  
             .attr("stroke-width",5)
-            .attr("stroke-opacity",0.2);
+            .attr("stroke-opacity",0.1);
     
     oldPath.transition()
 	.duration(duration)
@@ -250,9 +262,8 @@ function brushed() {
 	.remove();     
 
     oldPath = ansPath;
-
-     update(root);
 }
+
 
 function colorOnTick(tck,d,coloredNodes) {
       //console.log("Considering node %O", d);
@@ -269,7 +280,7 @@ function colorOnTick(tck,d,coloredNodes) {
          d.radius = lgCircSize;
          d.fillstyle = lgCircFill;
          d.strokestyle = lgCircStroke;
-             coloredNodes.push(d);
+         coloredNodes.push(d);
       } else {
         //console.log("Normal node: at tick level %d", d.tick);
          d.radius = smCircSize;
