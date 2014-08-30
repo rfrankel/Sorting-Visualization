@@ -181,6 +181,19 @@ var handle2 = gBrush.append("circle")
     .attr("cy", y(0))
     .attr("transform", "translate(" + wwidth + ", 0 )");
 
+// Undo the translations applied to our original SVG
+//function deTransX(coord) {
+// return coord - (twidth + tmargin.right + tmargin.left + wmargin.left) 
+//}
+
+//function deTransY(coord) {
+// return coord - wmargin.top 
+//}
+
+var curveFunction = d3.svg.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; })
+    .interpolate("cardinal");
 
 function brushed() {
   var extent0 = brush.extent(),
@@ -215,17 +228,40 @@ function brushed() {
   handle3.attr("y", y(extent1[1]));
   d3.select(this).call(brush.extent(extent1));
   
-  root.children.forEach(function(d) {colorOnTick(extent1[1],d);});
-  update(root);
+  coloredNodes = new Array();
+  root.children.forEach(function(d) {colorOnTick(extent1[1],d,coloredNodes);});
+  //console.log("coloredNodes is %O",coloredNodes);
+
+    var curvedata = coloredNodes.map(function(d) { return { "x": d.x, "y": d.y}});
+    //console.log("curvedata is %O",curvedata);
+    //console.log("Curve is %s",curveFunction(curvedata));
+
+    ansPath = treegr.append("path")
+            .attr("class","line")
+            .attr("d",curveFunction(curvedata))     
+            .attr("stroke",lgCircStroke)
+            .attr("fill","none")  
+            .attr("stroke-width",5)
+            .attr("stroke-opacity",0.2);
+    
+    oldPath.transition()
+	.duration(duration)
+	.attr("stroke-opacity",1e-6)
+	.remove();     
+
+    oldPath = ansPath;
+
+     update(root);
 }
 
-function colorOnTick(tck,d) {
+function colorOnTick(tck,d,coloredNodes) {
       //console.log("Considering node %O", d);
       if (d.Pp && d.tick <= tck)  {
         //console.log("Pivot -- at tick level %d", tck);
         d.radius = lgCircSize;
         d.fillstyle = lgCircFill;
         d.strokestyle = lgCircStroke;
+          coloredNodes.push(d);
        } else
          if (d.tick >= tck && d.parent.tick < tck && d.name != "{}") {
          //console.log("Parent tick %d less than tck %d", d.parent.tick, tck);
@@ -233,6 +269,7 @@ function colorOnTick(tck,d) {
          d.radius = lgCircSize;
          d.fillstyle = lgCircFill;
          d.strokestyle = lgCircStroke;
+             coloredNodes.push(d);
       } else {
         //console.log("Normal node: at tick level %d", d.tick);
          d.radius = smCircSize;
@@ -241,7 +278,7 @@ function colorOnTick(tck,d) {
       }
 
     if (d.children) {
-      d.children.forEach(function(d) {colorOnTick(tck,d);});
+	d.children.forEach(function(d) {colorOnTick(tck,d,coloredNodes);});
     }
   }
 
@@ -249,7 +286,7 @@ function colorOnTick(tck,d) {
 // ----------- Tree -------------------
 
 var i = 0,
-    duration = 750,
+    duration = 350, // changed from 750
     root;
 
 var tree = d3.layout.tree()
@@ -275,6 +312,13 @@ var diagonal = d3.svg.diagonal()
 
 var treegr = svg.append("g")
     .attr("transform", "translate(" + -1*(tmargin.right + wwidth + wmargin.right + wmargin.left) + "," + weavend + ")");
+
+// setting up variable to be used in event handler
+var oldPath = treegr.append("path")
+    .attr("d","M0,0")
+    .attr("fill","none")  
+    .attr("stroke-opacity",0.0);
+
 
 d3.json("./qsortTrackPivot.json", function(error, flare) {
   root = flare;
