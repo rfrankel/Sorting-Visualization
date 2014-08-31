@@ -1,11 +1,27 @@
-{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 import Data.Aeson
-import Data.ByteString.Lazy
-import GHC.Generics
+import qualified Data.ByteString.Lazy
+import System.Environment
+import System.Exit
 
-main = Data.ByteString.Lazy.putStr $ encode $ fst $ quicksort ([3, 9, 2, 5, 1, 4, 8, 0, 6, 7] :: [Int]) 0
+main = getArgs >>= parse >>= process
+        
+parse:: [String] -> IO [Int]
+parse ["-h"] = usage   >> exit
+parse ["-v"] = version >> exit
+parse []     = die
+parse argList = return $ map read $ words (last argList)  
+ 
+usage   = putStrLn "Usage: qsortclocked [-vh] (list to be sorted)"
+version = putStrLn "Haskell qsortclocked 0.1"
+exit    = exitWith ExitSuccess
+die     = exitWith (ExitFailure 1)
+
+-- My old test list was [3, 9, 2, 5, 1, 4, 8, 0, 6, 7]
+process :: [Int] -> IO ()
+process parsedList = Data.ByteString.Lazy.putStr $ encode $ fst $ quicksort parsedList 0
 
 type ClockTick = Int
  
