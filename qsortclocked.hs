@@ -52,7 +52,7 @@ instance ToJSON a => ToJSON (History a) where
              "tick" .= toJSON t,
              "children" .= [toJSON h1, object ["name" .= toJSON p, "tick" .= toJSON (t+1), "Pp" .= toJSON (True::Bool)], toJSON h2],
 	     "Pp" .= toJSON (False::Bool)]
-   toJSON (Leaf l t) = object ["name" .= toJSON ("Empty"::String), "tick" .= toJSON t, "Pp" .= toJSON (False::Bool)]
+   toJSON (Leaf l t) = object ["name" .= toJSON ("{}"::String), "tick" .= toJSON t, "Pp" .= toJSON (False::Bool)]
 
 --- instance ToJSON ClockTick where
 ---     toJSON t = object t
