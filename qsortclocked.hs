@@ -1,27 +1,44 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+-- Note to get list of lists
+-- allLists $ fst $ (quicksort (array) 0)
+
+
 module Main where
 import Data.Aeson
+import Data.List
 import qualified Data.ByteString.Lazy
 import System.Environment
 import System.Exit
+import System.IO
 
-main = getArgs >>= parse >>= process
+main = getArgs >>= doit
         
-parse:: [String] -> IO [Int]
-parse ["-h"] = usage   >> exit
-parse ["-v"] = version >> exit
-parse []     = die
-parse argList = return $ map read $ words (last argList)  
+-- My old test list was [3, 9, 2, 5, 1, 4, 8, 0, 6, 7]
+doit:: [String] -> IO ()
+doit ["-h"] = usage   >> exit
+doit ["-v"] = version >> exit
+doit []     = die
+doit [file, list] = do
+  let parsed = map read $ words list
+      (history, tick) = quicksort parsed 0
+  Data.ByteString.Lazy.putStr $ encode history
+  dump file $ allLists history
  
-usage   = putStrLn "Usage: qsortclocked [-vh] (list to be sorted)"
+usage   = putStrLn "Usage: qsortclocked [-vh] filename (list to be sorted)"
 version = putStrLn "Haskell qsortclocked 0.1"
 exit    = exitWith ExitSuccess
 die     = exitWith (ExitFailure 1)
 
--- My old test list was [3, 9, 2, 5, 1, 4, 8, 0, 6, 7]
-process :: [Int] -> IO ()
-process parsedList = Data.ByteString.Lazy.putStr $ encode $ fst $ quicksort parsedList 0
+-- using openFile :: FilePath -> IOMode -> IO Handle
+-- using intercalate :: [a] -> [[a]] -> [a]
+
+dump :: String -> [[Int]] -> IO ()
+dump filename lists = do
+  let contents = intercalate "\n" (map (intercalate " ") (map (map show) lists)) 
+  fHandle <- openFile filename WriteMode 
+  hPutStrLn fHandle contents          
+  hClose fHandle
 
 type ClockTick = Int
  
