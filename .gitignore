@@ -12,3 +12,9 @@ cabal.config
 *~
 *.hx
 *.hat*
+*.png
+*.json
+*.txt
+\#*
+.\#*
+*.html
