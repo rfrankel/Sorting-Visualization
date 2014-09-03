@@ -25,7 +25,7 @@ doit [file, list] = do
   Data.ByteString.Lazy.putStr $ encode history
   dump file $ allLists history
  
-usage   = putStrLn "Usage: qsortclocked [-vh] filename (list to be sorted)"
+usage   = putStrLn "Usage: qsortclocked [-vh] filename (list to be sorted) \n List should be numbers separated by spaces \n For example: ./qsortclocked qtest.txt \"3 9 2 5 1 4 8 0 6 7\""
 version = putStrLn "Haskell qsortclocked 0.1"
 exit    = exitWith ExitSuccess
 die     = exitWith (ExitFailure 1)
