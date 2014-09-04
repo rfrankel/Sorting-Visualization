@@ -18,9 +18,9 @@ Note that this code was mostly done as an exercise to learn/prove to myself that
 Notes about making a sorting visualization from the existing sortvis code
 
 Relevant Sortvis command line reference
+
     -F READFILE_SORTHIST  Read an entire sorting history from file
-    -o OFNAME             Output file name. Only usable when a single algorithm
-                      is being drawn.
+    -o OFNAME             Output file name. Only usable when a single algorithm is being drawn.
     -v                    Be verbose.
     --background=BACKGROUND
                       Background colour - default ffffff.
