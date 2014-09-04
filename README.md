@@ -18,17 +18,17 @@ Note that this code was mostly done as an exercise to learn/prove to myself that
 Notes about making a sorting visualization from the existing sortvis code
 
 Relevant Sortvis command line reference
-  -F READFILE_SORTHIST  Read an entire sorting history from file
-  -o OFNAME             Output file name. Only usable when a single algorithm
-                        is being drawn.
-  -v                    Be verbose.
-  --background=BACKGROUND
-                        Background colour - default ffffff.
-  --gradient-start=GRADIENT_START
-                        Gradient start colour - default ffffff.
-  --gradient-end=GRADIENT_END
-                        Gradient end colour - default 606060.
-
+    -F READFILE_SORTHIST  Read an entire sorting history from file
+    -o OFNAME             Output file name. Only usable when a single algorithm
+                      is being drawn.
+    -v                    Be verbose.
+    --background=BACKGROUND
+                      Background colour - default ffffff.
+    --gradient-start=GRADIENT_START
+                      Gradient start colour - default ffffff.
+    --gradient-end=GRADIENT_END
+                      Gradient end colour - default 606060.
+  
  Weave:
     Weave visualisation options.
 
@@ -49,7 +49,7 @@ Wanting better colors, I tried:
 
 Notes about generating json (and the text file needed by sortvis) from the Haskell program: 
 
-Usage: qsortclocked [-vh] filename (list to be sorted)
-Filename is the filename to send to sortvis
-List should be numbers separated by spaces 
-For example: ./qsortclocked svsequential.txt \"3 9 2 5 1 4 8 0 6 7\"
+    Usage: qsortclocked [-vh] filename (list to be sorted)
+    Filename is the filename to send to sortvis
+    List should be numbers separated by spaces 
+    For example: ./qsortclocked svsequential.txt \"3 9 2 5 1 4 8 0 6 7\"
