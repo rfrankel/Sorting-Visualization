@@ -1,7 +1,7 @@
 # The array to use 
 ARRAY = "2 5 9 8 1 4 6 7 0 3"
 # The filename of the file to put the list of lists
-LLFNAME = "sqsequential4.txt"
+LLFNAME = "svsequential4.txt"
 # The name of the output weave file
 WEAVEFNAME = "svseqbright4.png"
 # The name of the output json file
