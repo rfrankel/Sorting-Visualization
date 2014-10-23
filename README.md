@@ -53,3 +53,4 @@ Notes about generating json (and the text file needed by sortvis) from the Haske
     Filename is the filename to send to sortvis
     List should be numbers separated by spaces 
     For example: ./qsortclocked svsequential.txt \"3 9 2 5 1 4 8 0 6 7\"
+    The Json result is returned on standard out. 
