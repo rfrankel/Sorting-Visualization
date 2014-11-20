@@ -10,22 +10,28 @@ CMDLINEPARAM=2     #  Expect at least two command-line parameter.
 
 if [ $# -ge $CMDLINEPARAM ]
 then
-  JSONFILE=$1          #  If more than two command-line param,
-  LLFNAME=$2          #+ then just take the first two
+  JSONFILE=$1          #  If more than three command-line param,
+  LLFNAME=$2          #+ then just take the first three
+  WEAVENAME=$3
 else
   JSONFILE="qsortpivot.json"  #  Default, if no command-line parameter.
   LLFNAME="qtest.txt"
+  WEAVENAME="weave.png"
 fi  
 
-# Make png version of name 
+# Get the array that was sorted, for readme purposes
 
-LLNAME=${LLFNAME%.txt}
-LLFLOPPIC=${LLNAME}flop.png
-LLPIC=${LLNAME}.png
+ARRAY=$(head -n 1 ${LLFNAME})
 
-`../../contrib/sortvis/sortvis weave -F $LLFNAME --line-width=10 -x 720 -y 240 --background=eeeeee --gradient-end=393b79 --gradient-start=dadaeb -r -o $LLFLOPPIC`
+# Make png version of the sorting weave
 
-`convert -flop $LLFLOPPIC $LLPIC`
+WEAVENAME=${WEAVENAME%.png}
+WEAVEFLOPPIC=${WEAVENAME}flop.png
+WEAVEPIC=${WEAVENAME}.png
+
+`../../../../contrib/sortvis/sortvis weave -F $LLFNAME --line-width=10 -x 720 -y 240 --background=eeeeee --gradient-end=393b79 --gradient-start=dadaeb -r -o $WEAVEFLOPPIC`
+
+`convert -flop $WEAVEFLOPPIC $WEAVEPIC`
 
 HIGHTICK=`wc -l < $LLFNAME` 
 NUMTICKS=`expr $HIGHTICK - 1`
@@ -155,7 +161,7 @@ defs.append('svg:pattern')
     .attr('width', '240')
     .attr('height', '720')
     .append('svg:image')
-    .attr('xlink:href', '$LLPIC')
+    .attr('xlink:href', '$WEAVEPIC')
     .attr('x', 0)
     .attr('y', 0)
     .attr('width', 240)
@@ -509,5 +515,17 @@ function maxInArray( array ){
 
 </body>
 Endofmessage
+
+cat << EndOfReadme > ./README.md
+What This Shows
+--------------
+
+The tree shown is a visualization of the evaluation tree of Quick Sort applied to the list "$ARRAY". The tree has three branches at each clock tick: the left list, the right list, and the pivot. The progress in the tree aligned horizontally with the progress of the same sort shown as a weave visualization (in the style of Aldo Cortesis' Sortvis.) 
+
+How To Use
+----------
+
+Drag the blue handle! A blue path will light up showing how the list is generated from the tree of evaluation states at each clock tick. It meanders around because it has to pick up pivots from earlier stages and connect them will still unsorted sublists which will be worked on at later stages. You can also click on any node and the extent of the sorting work that is accomplished by the subtree under that node will be highlighted on the right. 
+EndOfReadme
 
 exit
